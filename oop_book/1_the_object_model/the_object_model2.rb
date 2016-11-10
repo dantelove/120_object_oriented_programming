@@ -10,6 +10,8 @@
 # A module's purpose is to extend the functionality of mulitple classes
 # in the same way.
 
+# Modules are used for 1) grouping common methods, and 2) namespacing.
+
 module Speak
   def speak(string)
     puts "#{string}"
