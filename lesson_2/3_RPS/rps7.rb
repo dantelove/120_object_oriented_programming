@@ -6,6 +6,13 @@
 # After you're done, can you talk about whether this was a good 
 # design decision? What are the pros/cons?
 
+# Trade-offs of this approach: On the one hand, we unpacked the
+# comparison logic in the ">" and "<" methods in the move class.
+# Much easier to follow now. On the other, we did have to add
+# a lengthier case statement to both Human and Player class
+# choose methods. That said, I think this is ultimately easier to
+# read, and as such consider it an improvement.
+
 class Move
   VALUES = ["rock", "paper", "scissors", "lizard", "spock"].freeze
 
@@ -33,64 +40,78 @@ class Move
     @value == "spock"
   end
 
-  def >(other_move)
-    (rock? && other_move.scissors?)     ||
-      (rock? && other_move.lizard?)     ||
-      (paper? && other_move.spock?)     ||
-      (paper? && other_move.rock?)      ||
-      (scissors? && other_move.paper?)  ||
-      (scissors? && other_move.lizard?) ||
-      (lizard? && other_move.spock?)    ||
-      (lizard? && other_move.paper?)    ||
-      (spock? && other_move.scissors?)  ||
-      (spock? && other_move.rock?)
-  end
-
-  def <(other_move)
-    (rock? && other_move.paper?)        ||
-      (rock? && other_move.spock?)      ||
-      (paper? && other_move.lizard?)    ||
-      (paper? && other_move.scissors?)  ||
-      (scissors? && other_move.spock?)  ||
-      (scissors? && other_move.rock?)   ||
-      (lizard? && other_move.rock?)     ||
-      (lizard? && other_move.scissors?) ||
-      (spock? && other_move.lizard?)    ||
-      (spock? && other_move.paper?)
-  end
-
   def to_s
     @value
   end
 end
 
 class Rock < Move
-  def initialize
+  def initialize(value)
+    super
+  end
 
+  def <(other_move)
+    other_move.paper? || other_move.spock?
+  end
+
+  def >(other_move)
+    other_move.scissors? || other_move.lizard?
   end
 end
 
 class Paper < Move
-  def initialize
+  def initialize(value)
+    super
+  end
 
+  def <(other_move)
+    other_move.lizard? || other_move.scissors?
+  end
+
+  def >(other_move)
+    other_move.spock? || other_move.rock? 
   end
 end
 
 class Scissors < Move
-  def initialize
+  def initialize(value)
+    super
+  end
 
+  def <(other_move)
+    other_move.spock? || other_move.rock?
+  end
+
+  def >(other_move)
+    other_move.paper? || other_move.lizard?
   end
 end
 
 class Lizard < Move
-  def initialize
+  def initialize(value)
+    super
+  end
 
+  def <(other_move)
+    other_move.rock? || other_move.scissors?
+  end
+
+  def >(other_move)
+    other_move.spock? || other_move.paper?
   end
 end
 
 class Spock < Move
-  def initialize
+  def initialize(value)
+    super
+  end
 
+  def <(other_move)
+    other_move.lizard? || other_move.paper?
+  end
+
+  def >(other_move)
+    other_move.scissors?  || other_move.rock?
   end
 end
 
@@ -123,7 +144,19 @@ class Human < Player
       break if Move::VALUES.include?(choice)
       puts "Sorry, invalid choice."
     end
-    self.move = Move.new(choice)
+    
+    case choice
+    when "rock"
+      self.move = Rock.new(choice)
+    when "paper"
+      self.move = Paper.new(choice)
+    when "scissors"
+      self.move = Scissors.new(choice)
+    when "lizard"
+      self.move = Lizard.new(choice)
+    when "spock"
+      self.move = Spock.new(choice)
+    end
   end
 end
 
@@ -133,7 +166,20 @@ class Computer < Player
   end
 
   def choose
-    self.move = Move.new(Move::VALUES.sample)
+    choice = Move::VALUES.sample
+    
+    case choice
+    when "rock"
+      self.move = Rock.new(choice)
+    when "paper"
+      self.move = Paper.new(choice)
+    when "scissors"
+      self.move = Scissors.new(choice)
+    when "lizard"
+      self.move = Lizard.new(choice)
+    when "spock"
+      self.move = Spock.new(choice)
+    end
   end
 end
 
