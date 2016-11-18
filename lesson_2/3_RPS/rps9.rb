@@ -116,12 +116,14 @@ class Spock < Move
 end
 
 class Player
-  attr_accessor :move, :name, :score, :move_history, :result_history
+  attr_accessor :move, :name, :score, :move_history, :result_history,
+                :total_moves
 
   def initialize
     @score = 0
     @move_history = []
     @result_history = []
+    @total_moves = 0
     set_name
   end
 end
@@ -151,46 +153,73 @@ class Human < Player
     when "rock"
       self.move = Rock.new(choice)
       self.move_history << "rock"
+      self.total_moves += 1
     when "paper"
       self.move = Paper.new(choice)
       self.move_history << "paper"
+      self.total_moves += 1
     when "scissors"
       self.move = Scissors.new(choice)
       self.move_history << "scissors"
+      self.total_moves += 1
     when "lizard"
       self.move = Lizard.new(choice)
       self.move_history << "lizard"
+      self.total_moves += 1
     when "spock"
       self.move = Spock.new(choice)
       self.move_history << "spock"
+      self.total_moves += 1
     end
   end
 end
 
 class Computer < Player
+  attr_accessor :move_values
+  
+  def initialize
+    super
+    @move_values = []
+  end
+
+  def update_move_values
+    values = ["rock", "paper", "scissors", "lizard", "spock"]
+
+    values.each do |x|
+      5.times do 
+        self.move_values << x
+      end
+    end
+  end
+
   def set_name
     self.name = ["R2D2", "Hal", "Deep Blue", "Number 5"].sample
   end
 
   def choose
-    choice = Move::VALUES.sample
-    
+    choice = move_values.sample
+
     case choice
     when "rock"
       self.move = Rock.new(choice)
       self.move_history << "rock"
+      self.total_moves += 1
     when "paper"
       self.move = Paper.new(choice)
       self.move_history << "paper"
+      self.total_moves += 1
     when "scissors"
       self.move = Scissors.new(choice)
       self.move_history << "scissors"
+      self.total_moves += 1
     when "lizard"
       self.move = Lizard.new(choice)
       self.move_history << "lizard"
+      self.total_moves += 1
     when "spock"
       self.move = Spock.new(choice)
       self.move_history << "spock"
+      self.total_moves += 1
     end
   end
 
@@ -211,45 +240,61 @@ class Computer < Player
       when "rock"
         if y == "won"
           hash[:rock][:won] += 1
+          self.move_values << "rock"
         elsif y == "lost"
           hash[:rock][:lost] += 1
+          self.move_values.delete_at(move_values.index("rock") || move_values.length )
         else
           hash[:rock][:tie] += 1
         end
       when "paper"
         if y == "won"
           hash[:paper][:won] += 1
+          self.move_values << "paper"
         elsif y == "lost"
           hash[:paper][:lost] += 1
+          self.move_values.delete_at(move_values.index("paper") || move_values.length )
         else
           hash[:paper][:tie] += 1
         end
       when "scissors"
         if y == "won"
           hash[:scissors][:won] += 1
+          self.move_values << "scissors"
         elsif y == "lost"
           hash[:scissors][:lost] += 1
+          self.move_values.delete_at(move_values.index("scissors") || move_values.length )
         else
           hash[:scissors][:tie] += 1
         end
       when "lizard"
         if y == "won"
           hash[:lizard][:won] += 1
+          self.move_values << "lizard"
         elsif y == "lost"
           hash[:lizard][:lost] += 1
+          self.move_values.delete_at(move_values.index("lizard") || move_values.length )
         else
           hash[:lizard][:tie] += 1
         end
       when "spock"
         if y == "won"
           hash[:spock][:won] += 1
+          self.move_values << "spock"
         elsif y == "lost"
           hash[:spock][:lost] += 1
+          self.move_values.delete_at(move_values.index("spock") || move_values.length )
         else
           hash[:spock][:tie] += 1
         end
       end
     end
+
+    # hash.each do |k, v|
+    #   v.each do |k1, v1|
+    #     v[k1] = ((v1.to_f / total_moves) * 100).round(1)
+    #   end
+    # end
 
     hash
   end
@@ -258,7 +303,7 @@ end
 class RPSGame
   attr_accessor :human, :computer
 
-  POINTS_TO_WIN = 3
+  POINTS_TO_WIN = 10
 
   def initialize
     @human = Human.new
@@ -288,6 +333,7 @@ class RPSGame
     display_welcome_message
     loop do
       score_reset
+      computer.update_move_values
       loop do
         human.choose
         computer.choose
@@ -302,6 +348,8 @@ class RPSGame
       display_move_history
       display_result_history
       display_compiled_move_history
+      display_move_values
+      total_moves
       break unless play_again?
     end
     display_goodbye_message
@@ -398,6 +446,26 @@ class RPSGame
       puts "#{k} #{v}"
     end
   puts "-------------------"
+  end
+
+  def total_moves
+    puts "Total Moves by #{computer.name}: #{computer.total_moves}"
+
+    puts "-------------------"
+  end
+
+  def display_move_values
+    puts "#{computer.name} Choice Probability:"
+
+    results = {}
+    computer.move_values.each do |x|
+      results[x] = computer.move_values.count(x)
+    end
+    results.each do |k,v|
+      puts "#{k} : #{(v.to_f / computer.move_values.size*100).round(0)}%"
+    end
+
+    puts "-------------------"
   end
 end
 
