@@ -1,20 +1,13 @@
-# rps9.rb
+# rps_10.rb
 
-# Come up with some rules based on the history of moves in order for 
-# the computer to make a future move. For example, if the human 
-# tends to win over 60% of his hands when the computer chooses 
-# "rock", then decrease the likelihood of choosing "rock". 
-# You'll have to first come up with a rule (like the one in the 
-# previous sentence), then implement some analysis on history to 
-# see if the history matches that rule, then adjust the weight of 
-# each choice, and finally have the computer consider the weight of 
-# each choice when making the move. Right now, the computer has a 
-# 33% chance to make any of the 3 moves.
-
-# I chose a simple probablistic computer decision-making model,
-# says, if the computer wins it should be ~20% more likely to make
-# that choice in the future. And if the computer loses, it should
-# be ~20% less likely to make that choice in the future.
+# We have a list of robot names for our Computer class, but other 
+# than the name, there's really nothing different about each of 
+# them. It'd be interesting to explore how to build different 
+# personalities for each robot. For example, R2D2 can always choose 
+# "rock". Or, "Hal" can have a very high tendency to choose 
+# "scissors", and rarely "rock", but never "paper". 
+# You can come up with the rules or personalities for each robot. 
+# How would you approach a feature like this?
 
 class Move
   VALUES = ["rock", "paper", "scissors", "lizard", "spock"].freeze
@@ -187,46 +180,42 @@ class Computer < Player
     @move_values = []
   end
 
-  def update_move_values
-    values = ["rock", "paper", "scissors", "lizard", "spock"]
+  # def update_move_values
+  #   values = ["rock", "paper", "scissors", "lizard", "spock"]
 
-    values.each do |x|
-      5.times do 
-        self.move_values << x
-      end
-    end
-  end
+  #   values.each do |x|
+  #     5.times do 
+  #       self.move_values << x
+  #     end
+  #   end
+  # end
 
-  def set_name
-    self.name = ["R2D2", "Hal", "Deep Blue", "Number 5"].sample
-  end
+  # def choose
+  #   choice = move_values.sample
 
-  def choose
-    choice = move_values.sample
-
-    case choice
-    when "rock"
-      self.move = Rock.new(choice)
-      self.move_history << "rock"
-      self.total_moves += 1
-    when "paper"
-      self.move = Paper.new(choice)
-      self.move_history << "paper"
-      self.total_moves += 1
-    when "scissors"
-      self.move = Scissors.new(choice)
-      self.move_history << "scissors"
-      self.total_moves += 1
-    when "lizard"
-      self.move = Lizard.new(choice)
-      self.move_history << "lizard"
-      self.total_moves += 1
-    when "spock"
-      self.move = Spock.new(choice)
-      self.move_history << "spock"
-      self.total_moves += 1
-    end
-  end
+  #   case choice
+  #   when "rock"
+  #     self.move = Rock.new(choice)
+  #     self.move_history << "rock"
+  #     self.total_moves += 1
+  #   when "paper"
+  #     self.move = Paper.new(choice)
+  #     self.move_history << "paper"
+  #     self.total_moves += 1
+  #   when "scissors"
+  #     self.move = Scissors.new(choice)
+  #     self.move_history << "scissors"
+  #     self.total_moves += 1
+  #   when "lizard"
+  #     self.move = Lizard.new(choice)
+  #     self.move_history << "lizard"
+  #     self.total_moves += 1
+  #   when "spock"
+  #     self.move = Spock.new(choice)
+  #     self.move_history << "spock"
+  #     self.total_moves += 1
+  #   end
+  # end
 
   def compile_move_history
     hash = {
@@ -299,14 +288,61 @@ class Computer < Player
   end
 end
 
+class R2D2 < Computer
+  def set_name
+    self.name = "R2D2"
+  end
+
+  def choose
+    self.move = Rock.new("rock")
+  end
+end
+
+class Hal < Computer
+  def set_name
+    self.name = "Hal"
+  end
+
+  def choose
+    choice = ["scissors", "scissors", "scissors", 
+              "scissors", "scissors", "rock"].sample
+
+    case choice
+    when "scissors" then self.move = Scissors.new(choice)
+    when "rock"     then self.move = Rock.new(choice)
+    end
+      
+  end
+end
+
+class DeepBlue < Computer
+  def set_name
+    self.name = "Depp Blue"
+  end
+
+  def choose
+    self.move = Spock.new("spock")
+  end
+end
+
+class Number5 < Computer
+  def set_name
+    self.name = "Number 5"
+  end
+
+  def choose
+    self.move = Lizard.new("lizard")
+  end
+end
+
 class RPSGame
   attr_accessor :human, :computer
 
-  POINTS_TO_WIN = 10
+  POINTS_TO_WIN = 3
 
   def initialize
     @human = Human.new
-    @computer = Computer.new
+    @computer = [R2D2.new, Hal.new, DeepBlue.new, Number5.new].sample
   end
 
   def display_welcome_message
@@ -332,23 +368,23 @@ class RPSGame
     display_welcome_message
     loop do
       score_reset
-      computer.update_move_values
+      # computer.update_move_values
       loop do
         human.choose
         computer.choose
         display_moves
         display_match_winner
         update_score
-        update_result_history
+        # update_result_history
         display_score
         break if game_winner?
       end
       display_game_winner
       display_move_history
       display_result_history
-      display_compiled_move_history
-      display_move_values
-      total_moves
+      #display_compiled_move_history
+      #display_move_values
+      #total_moves
       break unless play_again?
     end
     display_goodbye_message
