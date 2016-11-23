@@ -8,7 +8,7 @@ class Board
                   [[1,5,9], [3,5,7]]            #diagonals
   def initialize
     @squares = {}
-    (1..9).each {|key| @squares[key] = Square.new}
+    reset
   end
 
   def get_square_at(key)
@@ -31,20 +31,28 @@ class Board
     !!detect_winner
   end
 
+  def count_human_marker(squares)
+    squares.collect(&:marker).count(TTTGame::HUMAN_MARKER)
+  end
+
+  def count_computer_marker(squares)
+    squares.collect(&:marker).count(TTTGame::COMPUTER_MARKER)
+  end
+
   # returns the winning marker or returns nil
   def detect_winner
     WINNING_LINES.each do |line|
-      if @squares[line[0]].marker == TTTGame::HUMAN_MARKER && 
-         @squares[line[1]].marker == TTTGame::HUMAN_MARKER &&
-         @squares[line[2]].marker == TTTGame::HUMAN_MARKER
+      if count_human_marker(@squares.values_at(*line)) == 3
         return TTTGame::HUMAN_MARKER
-      elsif @squares[line[0]].marker == TTTGame::COMPUTER_MARKER && 
-            @squares[line[1]].marker == TTTGame::COMPUTER_MARKER &&
-            @squares[line[2]].marker == TTTGame::COMPUTER_MARKER
+      elsif count_computer_marker(@squares.values_at(*line)) == 3
         return TTTGame::COMPUTER_MARKER
       end
     end
     nil
+  end
+
+  def reset
+    (1..9).each {|key| @squares[key] = Square.new}
   end
 end
 
@@ -95,8 +103,8 @@ class TTTGame
     puts "Thanks for playing Tic Tac Toe!"
   end
 
-  def display_board
-    system "clear"
+  def display_board(clear = true)
+    system "clear" if clear
     puts "You're a #{human.marker}. Computer is a #{computer.marker}."
     puts ""
     puts "     |     |"
@@ -132,25 +140,53 @@ class TTTGame
   def display_result
     display_board
 
-    # case board.detect_winner
-    # when
-    puts "The board is full!"
+    case board.detect_winner
+    when human.marker
+      puts "You Won!"
+    when computer.marker
+      puts "Computer Won!"
+    else
+      puts "It's a tie!"
+    end
+  end
+
+  def play_again?
+    ans = nil
+
+    loop do
+      puts "Would you like to play again? (y/n)"
+      ans = gets.chomp.downcase
+      break if ["y", "n"].include?(ans)
+      puts "Sorry must be y or n"
+    end
+
+    ans == "y"
   end
 
   def play
     display_welcome_message
-    display_board
-    loop do
-      human_moves
-      break if board.someone_won? || board.full?
-      #break if someone_won? || board_full?
+    system "clear"
 
-      computer_moves
-      display_board
-      break if board.someone_won? || board.full?
-      #break if someone_won? || board_full?
+    loop do
+      display_board(false)
+
+      loop do
+        human_moves
+        break if board.someone_won? || board.full?
+
+        computer_moves
+        break if board.someone_won? || board.full?
+
+        display_board
+      end
+      display_result
+      break unless play_again?
+      board.reset
+      system "clear"
+      puts "Let's play again!"
+      puts ""
     end
-    display_result
+
     display_goodbye_message
   end 
 end
