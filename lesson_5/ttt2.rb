@@ -56,6 +56,8 @@ class Board
     @squares[num].marker = marker
   end
   
+  private
+  
   def three_identical_markers?(squares)
     markers = squares.select(&:marked?).collect(&:marker)
     return false if markers.size != 3
