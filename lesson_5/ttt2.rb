@@ -2,8 +2,6 @@
 
 # Some Improvements.
 
-require 'pry'
-
 class Board
   WINNING_LINES = [[1,2,3], [4,5,6], [7,8,9]] + #rows
                   [[1,4,7], [2,5,8], [3,6,9]] + #cols
@@ -25,21 +23,12 @@ class Board
     !!winning_marker
   end
 
-  def count_human_marker(squares)
-    squares.collect(&:marker).count(TTTGame::HUMAN_MARKER)
-  end
-
-  def count_computer_marker(squares)
-    squares.collect(&:marker).count(TTTGame::COMPUTER_MARKER)
-  end
-
   # returns the winning marker or returns nil
   def winning_marker
     WINNING_LINES.each do |line|
-      if count_human_marker(@squares.values_at(*line)) == 3
-        return TTTGame::HUMAN_MARKER
-      elsif count_computer_marker(@squares.values_at(*line)) == 3
-        return TTTGame::COMPUTER_MARKER
+      squares = @squares.values_at(*line)
+      if three_identical_markers?(squares)
+        return squares.first.marker
       end
     end
     nil
@@ -66,6 +55,12 @@ class Board
   def []=(num, marker)
     @squares[num].marker = marker
   end
+  
+  def three_identical_markers?(squares)
+    markers = squares.select(&:marked?).collect(&:marker)
+    return false if markers.size != 3
+    markers.min == markers.max
+  end
 end
 
 class Square
@@ -83,6 +78,10 @@ class Square
 
   def unmarked?
     marker == INITIAL_MARKER
+  end
+  
+  def marked?
+    marker != INITIAL_MARKER
   end
 end
 
