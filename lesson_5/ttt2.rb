@@ -3,9 +3,9 @@
 # Some Improvements.
 
 class Board
-  WINNING_LINES = [[1,2,3], [4,5,6], [7,8,9]] + #rows
-                  [[1,4,7], [2,5,8], [3,6,9]] + #cols
-                  [[1,5,9], [3,5,7]]            #diagonals
+  WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + # rows
+                  [[1, 4, 7], [2, 5, 8], [3, 6, 9]] + # cols
+                  [[1, 5, 9], [3, 5, 7]]              # diagonals
   def initialize
     @squares = {}
     reset
@@ -38,6 +38,7 @@ class Board
     (1..9).each { |key| @squares[key] = Square.new }
   end
 
+  # rubocop:disable Metrics/AbcSize
   def draw
     puts "     |     |"
     puts "  #{@squares[1]}  |  #{@squares[2]}  |  #{@squares[3]}"
@@ -51,13 +52,14 @@ class Board
     puts "  #{@squares[7]}  |  #{@squares[8]}  |  #{@squares[9]}"
     puts "     |     |"
   end
+  # rubocop:enable Metrics/AbcSize
 
   def []=(num, marker)
     @squares[num].marker = marker
   end
-  
+
   private
-  
+
   def three_identical_markers?(squares)
     markers = squares.select(&:marked?).collect(&:marker)
     return false if markers.size != 3
@@ -66,7 +68,7 @@ class Board
 end
 
 class Square
-  INITIAL_MARKER = " "
+  INITIAL_MARKER = " ".freeze
 
   attr_accessor :marker
 
@@ -81,7 +83,7 @@ class Square
   def unmarked?
     marker == INITIAL_MARKER
   end
-  
+
   def marked?
     marker != INITIAL_MARKER
   end
@@ -96,12 +98,12 @@ class Player
 end
 
 class TTTGame
-  HUMAN_MARKER = "X"
-  COMPUTER_MARKER = "O"
+  HUMAN_MARKER = "X".freeze
+  COMPUTER_MARKER = "O".freeze
   FIRST_TO_MOVE = HUMAN_MARKER
 
   attr_reader :board, :human, :computer
-  
+
   def play
     display_welcome_message
     clear
@@ -121,8 +123,8 @@ class TTTGame
     end
 
     display_goodbye_message
-  end 
-  
+  end
+
   private
 
   def initialize
@@ -149,7 +151,7 @@ class TTTGame
   end
 
   def human_moves
-    puts "Choose a square (#{board.unmarked_keys.join(", ")}):"
+    puts "Choose a square (#{board.unmarked_keys.join(', ')}):"
     square = nil
     loop do
       square = gets.to_i
@@ -209,7 +211,7 @@ class TTTGame
     @current_marker = FIRST_TO_MOVE
     clear
   end
-  
+
   def current_player_moves
     if human_turn?
       human_moves
@@ -219,7 +221,7 @@ class TTTGame
       @current_marker = HUMAN_MARKER
     end
   end
-  
+
   def human_turn?
     @current_marker == HUMAN_MARKER
   end
