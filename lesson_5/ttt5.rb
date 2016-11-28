@@ -59,8 +59,7 @@ class Board
   end
 
   def immediate_threat?
-    markers = squares.select(&:marked?).collect(&:marker)
-    markers.size == 2
+
   end
 
   private
@@ -199,7 +198,7 @@ class TTTGame
 
   def computer_moves
     if board.immediate_threat?
-      
+
     else
       board[board.unmarked_keys.sample] = computer.marker
     end
