@@ -1,6 +1,6 @@
 # ttt5.rb
 
-# Bonus Features: Computer AI: Defense
+# Bonus Features: AI Defense
 
 class Board
   WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + # rows
@@ -56,10 +56,6 @@ class Board
 
   def []=(num, marker)
     @squares[num].marker = marker
-  end
-
-  def immediate_threat?
-
   end
 
   private
@@ -197,11 +193,7 @@ class TTTGame
   end
 
   def computer_moves
-    if board.immediate_threat?
-
-    else
-      board[board.unmarked_keys.sample] = computer.marker
-    end
+    board[board.unmarked_keys.sample] = computer.marker
   end
 
   def update_score
