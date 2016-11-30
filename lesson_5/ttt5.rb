@@ -45,7 +45,6 @@ class Board
       squares = @squares.values_at(*line)
       if two_human_markers?(squares) && no_third_marker?(squares)
         line.each do  |x|
-          binding.pry 
           return x if @squares[x].marker == " "
         end
       end
