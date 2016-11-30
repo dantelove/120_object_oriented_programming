@@ -2,6 +2,8 @@
 
 # Bonus Features: AI Defense
 
+require "pry"
+
 class Board
   WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + # rows
                   [[1, 4, 7], [2, 5, 8], [3, 6, 9]] + # cols
@@ -29,6 +31,23 @@ class Board
       squares = @squares.values_at(*line)
       if three_identical_markers?(squares)
         return squares.first.marker
+      end
+    end
+    nil
+  end
+
+  def at_risk?
+    !!find_at_risk_square
+  end
+
+  def find_at_risk_square
+    WINNING_LINES.each do |line|
+      squares = @squares.values_at(*line)
+      if two_human_markers?(squares) && no_third_marker?(squares)
+        line.each do  |x|
+          binding.pry 
+          return x if @squares[x].marker == " "
+        end
       end
     end
     nil
@@ -65,9 +84,20 @@ class Board
     return false if markers.size != 3
     markers.min == markers.max
   end
+
+  def two_human_markers?(squares)
+    markers = squares.select(&:human_marked?).collect(&:marker)
+    markers.size == 2
+  end
+
+  def no_third_marker?(squares)
+    markers = squares.select(&:unmarked?).collect(&:marker)
+    markers.size == 1
+  end
 end
 
 class Square
+  HUMAN_MARKER = "X".freeze
   INITIAL_MARKER = " ".freeze
 
   attr_accessor :marker
@@ -86,6 +116,10 @@ class Square
 
   def marked?
     marker != INITIAL_MARKER
+  end
+
+  def human_marked?
+    marker == HUMAN_MARKER
   end
 end
 
@@ -193,7 +227,12 @@ class TTTGame
   end
 
   def computer_moves
-    board[board.unmarked_keys.sample] = computer.marker
+    if board.at_risk?
+      square = board.find_at_risk_square
+      board[square] = computer.marker
+    else
+      board[board.unmarked_keys.sample] = computer.marker
+    end
   end
 
   def update_score
