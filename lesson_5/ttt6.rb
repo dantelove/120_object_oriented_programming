@@ -1,6 +1,6 @@
-# ttt5.rb
+# ttt6.rb
 
-# Bonus Features: AI Defense & AI Offense
+# Bonus Features: Computer Turn Refinements
 
 require "pry"
 
@@ -42,6 +42,10 @@ class Board
 
   def can_win?
     !!find_winning_square
+  end
+
+  def five_open?
+    @squares[5].marker == " "
   end
 
   def find_at_risk_square
@@ -171,10 +175,10 @@ class TTTGame
 
     loop do
       display_board
+      first_to_move
 
       loop do
         loop do
-          first_to_move
           current_player_moves
           break if board.someone_won_match? || board.full?
           clear_screen_and_display_board if human_turn?
@@ -241,6 +245,7 @@ class TTTGame
   end
 
   def first_to_move
+    ans = nil
     loop do
       puts "Who moves first? Please choose 'player' or 'computer'."
       ans = gets.chomp
@@ -273,6 +278,8 @@ class TTTGame
     elsif board.at_risk?
       square = board.find_at_risk_square
       board[square] = computer.marker
+    elsif board.five_open?
+      board[5] = computer.marker
     else
       board[board.unmarked_keys.sample] = computer.marker
     end
