@@ -1,6 +1,6 @@
 # ttt5.rb
 
-# Bonus Features: AI Defense
+# Bonus Features: AI Defense & AI Offense
 
 require "pry"
 
@@ -40,10 +40,26 @@ class Board
     !!find_at_risk_square
   end
 
+  def can_win?
+    !!find_winning_square
+  end
+
   def find_at_risk_square
     WINNING_LINES.each do |line|
       squares = @squares.values_at(*line)
       if two_human_markers?(squares) && no_third_marker?(squares)
+        line.each do  |x|
+          return x if @squares[x].marker == " "
+        end
+      end
+    end
+    nil
+  end
+
+  def find_winning_square
+    WINNING_LINES.each do |line|
+      squares = @squares.values_at(*line)
+      if two_computer_markers?(squares) && no_third_marker?(squares)
         line.each do  |x|
           return x if @squares[x].marker == " "
         end
@@ -89,6 +105,11 @@ class Board
     markers.size == 2
   end
 
+  def two_computer_markers?(squares)
+    markers = squares.select(&:computer_marked?).collect(&:marker)
+    markers.size == 2
+  end
+
   def no_third_marker?(squares)
     markers = squares.select(&:unmarked?).collect(&:marker)
     markers.size == 1
@@ -97,6 +118,7 @@ end
 
 class Square
   HUMAN_MARKER = "X".freeze
+  COMPUTER_MARKER = "O".freeze
   INITIAL_MARKER = " ".freeze
 
   attr_accessor :marker
@@ -119,6 +141,10 @@ class Square
 
   def human_marked?
     marker == HUMAN_MARKER
+  end
+
+  def computer_marked?
+    marker == COMPUTER_MARKER
   end
 end
 
@@ -226,7 +252,10 @@ class TTTGame
   end
 
   def computer_moves
-    if board.at_risk?
+    if board.can_win?
+      square = board.find_winning_square
+      board[square] = computer.marker
+    elsif board.at_risk?
       square = board.find_at_risk_square
       board[square] = computer.marker
     else
