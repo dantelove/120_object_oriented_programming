@@ -1,5 +1,7 @@
 # 21_1.rb
 
+require "pry"
+
 class Player
   attr_accessor :name, :first_card, :second_card
   
@@ -10,8 +12,8 @@ class Player
   end
 
   def deal
-    @first_card = @deck.delete_at(rand(deck.length))
-    @second_card = @deck.delete_at(rand(deck.length))
+    @first_card = @deck.delete_at(rand(@deck.to_a.length))
+    @second_card = @deck.delete_at(rand(@deck.to_a.length))
   end
 
   def hit
@@ -42,8 +44,8 @@ class Dealer
   end
 
   def deal
-    @first_card = @deck.delete_at(rand(deck.length))
-    @second_card = @deck.delete_at(rand(deck.length))
+    @first_card = @deck.delete_at(rand(@deck.length))
+    @second_card = @deck.delete_at(rand(@deck.length))
   end
 
   def stay
@@ -91,6 +93,7 @@ class Game
   end
 
   def start
+    binding.pry
     deal_cards
     show_initial_cards
     player_turn
@@ -99,8 +102,8 @@ class Game
   end
 
   def deal_cards
-    dealer.deal
-    player.deal
+    @dealer.deal
+    @player.deal
   end
 
   def show_initial_cards
